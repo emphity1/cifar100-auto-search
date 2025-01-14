@@ -18,22 +18,26 @@ N_BLOCKS = 7
 MAX_SAMPLES = 50
 MAX_ATTEMPTS = 100000
 
-MIN_PARAM, MAX_PARAM = 100_000, 140_000
+MIN_PARAM, MAX_PARAM = 200_000, 240_000
 MIN_FLOPS, MAX_FLOPS = 10_000_000, 15_000_000
 
 # CHANNEL_SET: multiples of 16 from 16 to 192, or any custom set
 # CHANNEL_SET = [16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192]
-CHANNEL_SET = [16,24,32,40,44,48,54,60,64,70,74,80,90]
+CHANNEL_SET = [16, 24, 32, 40, 48, 64, 72, 80, 96, 112]
 
 # Expansion: first block => [1,2,3], other blocks => [3,4,5,6]
 FIRST_EXPANSION_SET = [1, 2]
-OTHER_EXPANSION_SET = [2, 3, 4, 5]
+OTHER_EXPANSION_SET = [2, 3, 4]
 
 STRIDE_SET = [1, 2]
 KERNEL_SET = [3, 5]
 
 # Maximum allowed skip connections
 MAX_SKIPS = 2
+# Min blocks with stride=1
+BLOCKS_WITH_STRIDES = 2
+# Min blocks with kernel=5
+BLOCKS_KERNEL5=3
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -235,12 +239,12 @@ def main():
         # Requirements:
         # - At least 2 blocks with stride=1
         stride1_count = sum(1 for b in chain if b[3] == 1)
-        if stride1_count < 2:
+        if stride1_count < BLOCKS_WITH_STRIDES:
             continue
 
         # - At least 3 blocks with kernel=5
         kernel5_count = sum(1 for b in chain if b[4] == 5)
-        if kernel5_count < 3:
+        if kernel5_count < BLOCKS_KERNEL5:
             continue
 
         # - skip connections => out_ch == in_ch => at most MAX_SKIPS
