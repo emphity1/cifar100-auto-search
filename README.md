@@ -1,4 +1,4 @@
-# cifar100-optuna
+# cifar100-auto-search-space
 
 ---
 
